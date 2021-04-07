@@ -37,7 +37,7 @@ def change_prev_flow_state(number):
     logger.info(f"The number submitted to this Task was: {number}")
 
     client = Client()
-    client.login_to_tenant(tenant_slug="default")
+    client.login_to_tenant(tenant_slug="kmw-cloud")
 
     if number is None:
         logger.info("Outcome: Your number was None")
@@ -125,4 +125,4 @@ flow2.storage = GitHub(
     path="state_generators/2_prev_run_state_changer.py",
     access_token_secret="GITHUB_ACCESS_TOKEN"
 )
-flow2.register(project_name="Demos")
+flow2.register(project_name="State Generators")
