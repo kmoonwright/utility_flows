@@ -9,7 +9,7 @@ from prefect.engine.signals import SUCCESS, FAIL, SKIP, ENDRUN, LOOP
 from prefect.engine import state
 from prefect.tasks.prefect import StartFlowRun
 from prefect.artifacts import create_link, create_markdown
-from prefect.storage import Local, GitLab
+from prefect.storage import Local, GitHub
 
 
 # ---------------------------------------- #
@@ -56,3 +56,10 @@ flow1.add_edge(t1, t2)
 flow1.add_edge(t2, t3)
 flow1.add_edge(t3, t4)
 flow1.add_edge(t4, t5)
+
+flow1.storage = GitHub(
+    repo="kmoonwright/utility_flows",
+    path="state_generators/1_random_state_generator.py",
+    access_token_secret="GITLAB_ACCESS_TOKEN"
+)
+flow1.register(project_name="Demos")
