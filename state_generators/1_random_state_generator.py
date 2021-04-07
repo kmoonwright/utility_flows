@@ -35,7 +35,7 @@ def generate_flow_run_id():
     return flow_run_id
 
 initiate_flow_run_changer = StartFlowRun(
-    project_name="Demos", 
+    project_name="State Generators", 
     flow_name="Previous Flow Run State Changer",
 )
 
@@ -60,6 +60,6 @@ flow1.add_edge(t4, t5)
 flow1.storage = GitHub(
     repo="kmoonwright/utility_flows",
     path="state_generators/1_random_state_generator.py",
-    access_token_secret="GITLAB_ACCESS_TOKEN"
+    access_token_secret="GITHUB_ACCESS_TOKEN"
 )
-flow1.register(project_name="Demos")
+flow1.register(project_name="State Generators")
