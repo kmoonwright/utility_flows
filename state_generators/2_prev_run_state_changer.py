@@ -9,7 +9,7 @@ from prefect.engine.signals import SUCCESS, FAIL, SKIP, ENDRUN, LOOP
 from prefect.engine import state
 from prefect.tasks.prefect import StartFlowRun
 from prefect.artifacts import create_link, create_markdown
-from prefect.storage import Local, GitLab
+from prefect.storage import Local, GitHub
 
 # ---------------------------------------- #
 # FLOW RUN STATE CHANGER
