@@ -121,8 +121,8 @@ with Flow("Previous Flow Run State Changer") as flow2:
 
 flow2.add_edge(t1, t2)
 flow2.storage = GitHub(
-    repo="kmoonwright/demo_flows",                           # name of repo
-    path="flows/state_generator_set.py",                   # location of flow file in repo
-    access_token_secret="GITLAB_ACCESS_TOKEN"  # name of personal access token secret
+    repo="kmoonwright/utility_flows",
+    path="state_generators/2_prev_run_state_changer.py",
+    access_token_secret="GITHUB_ACCESS_TOKEN"
 )
 flow2.register(project_name="Demos")
