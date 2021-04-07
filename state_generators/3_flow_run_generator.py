@@ -59,14 +59,17 @@ from prefect.storage import Local, GitHub
 def generate_list(length):
     return ["Random State Generator" for name in range(length)]
 
-create_flow_runs = StartFlowRun(project_name="Demos", flow_name="Random State Generator")
+create_flow_runs = StartFlowRun(
+    project_name="State Generators", 
+    flow_name="Random State Generator"
+)
 
 with Flow("Flow Run Generator") as flow3:
     num_of_flows = Parameter("num_of_flows", default=5)
     my_flow_runs = generate_list(num_of_flows)
     create_flow_runs.map(my_flow_runs)
 
-flow3.storage = GitLab(
+flow3.storage = GitHub(
     repo="kmoonwright/utility_flows",
     path="state_generators/3_flow_run_generator.py",
     access_token_secret="GITHUB_ACCESS_TOKEN"
