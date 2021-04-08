@@ -28,7 +28,7 @@ def log_prev_num():
     return prev_random_number
 
 @task
-def change_prev_flow_state(number):
+def change_prev_flow_state(number, secret):
     logger = prefect.context.get("logger")
     prev_random_number = prefect.context.get("prev_random_number")
     prev_flow_run_id = prefect.context.get("prev_flow_run_id")
@@ -36,7 +36,7 @@ def change_prev_flow_state(number):
     logger.info(f"The number retrieved from Context was: {prev_random_number}")
     logger.info(f"The number submitted to this Task was: {number}")
 
-    client = Client()
+    client = Client(api_token=secret)
     client.login_to_tenant(tenant_slug="kmw-cloud")
 
     if number is None:
@@ -116,7 +116,8 @@ def change_prev_flow_state(number):
 with Flow("Previous Flow Run State Changer") as flow2:
     t1 = log_prev_flow_run_id()
     t2 = log_prev_num()
-    t3 = change_prev_flow_state(t2)
+    secret = PrefectSecret("PERSONAL_ACCESS_TOKEN")
+    t3 = change_prev_flow_state(t2, secret)
     create_link(prefect.context.get("prev_flow_run_id"))
 
 flow2.add_edge(t1, t2)
