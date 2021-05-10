@@ -52,16 +52,17 @@ def upload_image(client, file_name, container, path):
     
 
 with Flow("Upload to Azure") as flow:
-    file_name = Parameter(name="Upload File", default="prefect_icon.png")
+    file_name = Parameter(name="Upload File Name", default="prefect_icon.png")
+    file_path = Parameter(name="Upload File Path", default="/Users/kyle/projects/utility_flows/azure")
     connection = EnvVarSecret("BLOB_STORAGE_KEY")
     client = start_azure_client(connection)
-    container, path = get_image_container(), get_path()
+    container = get_image_container()
 
     single_or_multiple = file_count_check()
     with case(single_or_multiple, True):
-        upload_image(client=client, file_name=file_name, container=container, path=path)
+        upload_image(client=client, file_name=file_name, container=container, path=file_path)
     with case(single_or_multiple, False):
-        upload_all_images_in_folder(client=client, container=container, path=path)
+        upload_all_images_in_folder(client=client, container=container, path=file_path)
 
 if __name__ == "__main__":
     flow.run()
