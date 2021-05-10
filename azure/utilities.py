@@ -10,7 +10,7 @@ def logger_helper():
         mutation {
             create_flow_run(
                 input: {
-                    flow_id: "28e02bb3-b145-4eca-89a7-8b41281fb9cc",
+                    flow_id: "61d6071b-cd81-4505-877b-18081c129b4b",
                 }
             ) {
                 id
