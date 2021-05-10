@@ -1,7 +1,8 @@
 import os
 import datetime
 from utilities import logger_helper
-from prefect import task, Flow, Parameter, context, case
+import prefect
+from prefect import task, Flow, Parameter, case
 from prefect.tasks.secrets import EnvVarSecret
 from azure.storage.blob import BlobServiceClient, BlobClient
 from azure.storage.blob import ContentSettings
@@ -21,7 +22,7 @@ def start_azure_client(connection):
 
 @task
 def file_count_check():
-    logger = context.get("logger")
+    logger = prefect.context.get("logger")
     if isinstance(1, str):
         logger.info("Uploading multiple files...")
         return False
@@ -36,7 +37,7 @@ def upload_all_images_in_folder(client, path, container):
                     if os.path.isfile(os.path.join(path, f)) and ".jpg" in f]
 
     for file_name in all_file_names:
-        logger = context.get("logger")
+        logger = prefect.context.get("logger")
         logger.info(f"Uploading file - {file_name}")
         client.upload_image(file_name)
 
@@ -45,7 +46,7 @@ def upload_image(client, file_name, container, path):
     blob_client = client.get_blob_client(container=container, blob=f"{file_name}_{datetime.datetime.now()}")
     upload_file_path = os.path.join(path, file_name)
     image_content_setting = ContentSettings(content_type='image/jpeg')
-    logger, add_utility = context.get("logger"), logger_helper()
+    logger, add_utility = prefect.context.get("logger"), logger_helper()
     logger.info(f"Uploading file - {file_name}")
 
     with open(upload_file_path, "rb") as data:
