@@ -13,10 +13,10 @@ def transform(data):
 def load(data):
     print(f"\nHere's your data: {data}")
 
-with Flow("Evolving ETL") as flow:
+with Flow("My Event Triggered ETL") as flow:
     e = extract()
     t = transform(e)
     l = load(t)
-    
+
 if __name__ == "__main__":
     flow.run()
