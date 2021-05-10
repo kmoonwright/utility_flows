@@ -5,6 +5,7 @@ from prefect.schedules import CronSchedule
 from prefect.engine.signals import SUCCESS, FAIL
 from prefect.triggers import always_run
 from prefect.tasks.prefect.flow_run import StartFlowRun
+from prefect.artifacts import create_link, create_markdown
 
 job_1 = StartFlowRun(
     flow_name="My Event Triggered ETL",
@@ -46,6 +47,9 @@ with Flow("Orchestrator Flow", schedule=weekday_schedule) as flow:
     d = fail_task(upstream_tasks=[a])
 
     final = log_success(upstream_tasks=[b, c, d])
+    create_link(f"cloud.prefect.io/km-inc/flow-run/{a}")
+    create_link(f"cloud.prefect.io/km-inc/flow-run/{b}")
+    create_link(f"cloud.prefect.io/km-inc/flow-run/{c}")
 
 if __name__ == "__main__":
     flow.register(project_name="Azure")
