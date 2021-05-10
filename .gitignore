@@ -1,1 +1,2 @@
-state_generators/register_all.zsh
+state_generators/*
+azure/__pycache__
