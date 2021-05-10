@@ -29,7 +29,7 @@ def file_count_check():
         return True
 
 @task
-def upload_all_images_in_folder(client, path):
+def upload_all_images_in_folder(client, path, container):
     # Get all files with jpg extension and exclude directories
     all_file_names = [f for f in os.listdir(path)
                     if os.path.isfile(os.path.join(path, f)) and ".jpg" in f]
@@ -61,7 +61,7 @@ with Flow("Upload to Azure") as flow:
     with case(single_or_multiple, True):
         upload_image(client=client, file_name=file_name, container=container, path=path)
     with case(single_or_multiple, False):
-        upload_all_images_in_folder(client=client, file_name=file_name, container=container, path=path)
+        upload_all_images_in_folder(client=client, container=container, path=path)
 
 if __name__ == "__main__":
     flow.run()
