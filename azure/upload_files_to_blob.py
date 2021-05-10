@@ -2,13 +2,10 @@ import os
 import datetime
 
 from prefect import task, Flow, Parameter, context, case
+from prefect.tasks.secrets import EnvVarSecret
 from azure.storage.blob import BlobServiceClient, BlobClient
-from azure.storage.blob import ContentSettings, ContainerClient
+from azure.storage.blob import ContentSettings
 
-@task
-def get_connection_str():
-    return "DefaultEndpointsProtocol=https;AccountName=kmoonblobstorage;AccountKey=lhBk0ub0UDsCLBmOzw9Twzag7DL6zWJN+MeDdtIiuY5zbXp/gHg+HijfJ3YUmQ2NE3nt4Fl9PNpIYVdNrqk9pQ==;EndpointSuffix=core.windows.net"
- 
 @task
 def get_image_container():
     return "incomingdata"
@@ -36,7 +33,7 @@ def upload_all_images_in_folder(client, path):
     # Get all files with jpg extension and exclude directories
     all_file_names = [f for f in os.listdir(path)
                     if os.path.isfile(os.path.join(path, f)) and ".jpg" in f]
-                    
+
     for file_name in all_file_names:
         logger = context.get("logger")
         logger.info(f"Uploading file - {file_name}")
@@ -56,8 +53,7 @@ def upload_image(client, file_name, container, path):
 
 with Flow("Upload to Azure") as flow:
     file_name = Parameter(name="Upload File", default="prefect_icon.png")
-
-    connection = get_connection_str() 
+    connection = EnvVarSecret("BLOB_STORAGE_KEY")
     client = start_azure_client(connection)
     container, path = get_image_container(), get_path()
 
