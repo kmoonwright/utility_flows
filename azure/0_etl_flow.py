@@ -19,4 +19,4 @@ with Flow("My Event Triggered ETL") as flow:
     l = load(t)
 
 if __name__ == "__main__":
-    flow.run()
+    flow.register(project_name="Azure")
