@@ -3,24 +3,23 @@ import datetime
 from utilities import logger_helper
 import prefect
 from prefect import task, Flow, Parameter, case
-from prefect.tasks.secrets import EnvVarSecret
+from prefect.tasks.secrets import PrefectSecret, EnvVarSecret
+from prefect.storage import Docker
 from azure.storage.blob import BlobServiceClient, BlobClient
 from azure.storage.blob import ContentSettings
 
 # TASK DEFINITIONS
-@task
-def get_image_container():
-    return "incomingdata"
- 
-@task
-def get_path():
-    return "/Users/kyle/projects/utility_flows/azure"
- 
-@task
+file_name = Parameter(name="File Name", default="prefect_icon.png")
+
+file_path = Parameter(name="File Path", default="/Users/kyle/projects/utility_flows/azure")
+
+blob_container = Parameter(name="Blob Container", default="incomingdata")
+
+@task(name="Start Azure Client")
 def start_azure_client(connection):
     return BlobServiceClient.from_connection_string(connection)
 
-@task
+@task(name="Multiple Files?")
 def file_count_check():
     logger = prefect.context.get("logger")
     if isinstance(1, str):
@@ -31,7 +30,7 @@ def file_count_check():
         return True
 
 @task
-def upload_all_images_in_folder(client, path, container):
+def upload_all_images_in_folder(client, file_name, container, path):
     # Get all files with jpg extension and exclude directories
     all_file_names = [f for f in os.listdir(path)
                     if os.path.isfile(os.path.join(path, f)) and ".jpg" in f]
@@ -50,21 +49,19 @@ def upload_image(client, file_name, container, path):
     logger.info(f"Uploading file - {file_name}")
 
     with open(upload_file_path, "rb") as data:
-        blob_client.upload_blob(data, overwrite=True, content_settings=image_content_setting)
-    
+        blob_client.upload_blob("hello", overwrite=True, content_settings=image_content_setting)
+
 # FLOW DEFINITIONS
 with Flow("Upload to Azure") as flow:
-    file_name = Parameter(name="Upload File Name", default="prefect_icon.png")
-    file_path = Parameter(name="Upload File Path", default="/Users/kyle/projects/utility_flows/azure")
-    connection = EnvVarSecret("BLOB_STORAGE_KEY")
-    client = start_azure_client(connection)
-    container = get_image_container()
+    connection = EnvVarSecret("BLOB_STORAGE_KEY")(upstream_tasks=[file_name, file_path, blob_container])
+    client = start_azure_client(connection=connection)
 
-    single_or_multiple = file_count_check()
+    single_or_multiple = file_count_check(upstream_tasks=[client])
     with case(single_or_multiple, True):
-        upload_image(client=client, file_name=file_name, container=container, path=file_path)
+        upload = upload_image(client=client, file_name=file_name, container=blob_container, path=file_path)
     with case(single_or_multiple, False):
-        upload_all_images_in_folder(client=client, container=container, path=file_path)
+        upload_all_images_in_folder(client=client, file_name=file_name, container=blob_container, path=file_path)
 
 if __name__ == "__main__":
-    flow.register(project_name="Azure")
+    flow.run()
+    # flow.register(project_name="Azure")
