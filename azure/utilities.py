@@ -1,7 +1,9 @@
 import prefect
 import os
+import time
 
 def logger_helper():
+    time.sleep(6)
     TOKEN = os.getenv('AZURE_TMP_TOKEN')
     client = prefect.Client(api_token=TOKEN)
     client.login_to_tenant(tenant_slug="km-inc")
