@@ -1,11 +1,12 @@
 import os
 import datetime
-
+from utilities import logger_helper
 from prefect import task, Flow, Parameter, context, case
 from prefect.tasks.secrets import EnvVarSecret
 from azure.storage.blob import BlobServiceClient, BlobClient
 from azure.storage.blob import ContentSettings
 
+# TASK DEFINITIONS
 @task
 def get_image_container():
     return "incomingdata"
@@ -44,13 +45,13 @@ def upload_image(client, file_name, container, path):
     blob_client = client.get_blob_client(container=container, blob=f"{file_name}_{datetime.datetime.now()}")
     upload_file_path = os.path.join(path, file_name)
     image_content_setting = ContentSettings(content_type='image/jpeg')
-    logger = context.get("logger")
+    logger, add_utility = context.get("logger"), logger_helper()
     logger.info(f"Uploading file - {file_name}")
 
     with open(upload_file_path, "rb") as data:
         blob_client.upload_blob(data, overwrite=True, content_settings=image_content_setting)
     
-
+# FLOW DEFINITIONS
 with Flow("Upload to Azure") as flow:
     file_name = Parameter(name="Upload File Name", default="prefect_icon.png")
     file_path = Parameter(name="Upload File Path", default="/Users/kyle/projects/utility_flows/azure")
@@ -65,4 +66,4 @@ with Flow("Upload to Azure") as flow:
         upload_all_images_in_folder(client=client, container=container, path=file_path)
 
 if __name__ == "__main__":
-    flow.run()
+    flow.register(project_name="Azure")
