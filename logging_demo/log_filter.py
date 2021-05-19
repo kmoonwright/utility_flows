@@ -42,8 +42,8 @@ with Flow(
         access_token_secret="GITHUB_ACCESS_TOKEN"
     )
 ) as flow:
-    first_task()
-    second_task(upstream_tasks="first_task")
-    third_task(upstream_tasks="second_task")
+    first = first_task()
+    second = second_task(upstream_tasks=[first])
+    third_task(upstream_tasks=[second])
 
 flow.register(project_name="logging-demo")
