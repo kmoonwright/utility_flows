@@ -14,10 +14,10 @@ def transform(data):
 @task
 def load(data):
     logger = prefect.context.get("logger")
-    logger.info(f"\nHere's your data: {data}")
+    logger.info(f"\nHELLO! Your data is: {data}")
 
 with Flow(
-    "Evolving ETL",
+    "Hello ETL",
     storage=GitHub(
         repo="kmoonwright/utility_flows",
         path="logging_demo/hello_etl.py",
