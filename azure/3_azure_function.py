@@ -13,6 +13,7 @@ def start_client():
 @task
 def initiate_flow_run(client, flow_id):
     client.graphql(
+        """
         {
             "mutation": {
                 "create_flow_run"(
@@ -26,6 +27,7 @@ def initiate_flow_run(client, flow_id):
                 }
             }
         }
+        """
     )
 
 with Flow("Azure Functions GQL Call") as flow:
