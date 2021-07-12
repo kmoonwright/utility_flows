@@ -45,6 +45,6 @@ with Flow(
     query = execute_query(pg_client, postgres_table)
     df = create_df(query)
     sf_client = connect_to_snowflake()
-    update_warehouse = upload_to_snowflake(df)
+    update_warehouse = upload_to_snowflake(sf_client, df)
 
 flow.register(project_name="production-flows")
