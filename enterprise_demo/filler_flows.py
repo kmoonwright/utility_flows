@@ -33,7 +33,7 @@ def task_3():
     interval = randrange(0, 60)
     logger.info(interval)
     time.sleep(interval)
-    if interval > 40:
+    if interval > 50:
         logger.info("Failing flow...")
         raise signals.FAIL()
 
