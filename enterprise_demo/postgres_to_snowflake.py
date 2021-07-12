@@ -20,7 +20,7 @@ def create_df(data):
     time.sleep(10)
 
 @task
-def connect_to_snowflake(data):
+def connect_to_snowflake():
     time.sleep(10)
 
 @task
@@ -46,3 +46,5 @@ with Flow(
     df = create_df(query)
     sf_client = connect_to_snowflake()
     update_warehouse = upload_to_snowflake(df)
+
+flow.register(project_name="production-flows")
