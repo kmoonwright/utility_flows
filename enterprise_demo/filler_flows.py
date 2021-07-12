@@ -4,6 +4,7 @@ from random import randrange
 
 import prefect
 from prefect import task, Flow
+from prefect.storage import GitHub
 from prefect.schedules import Schedule
 from prefect.schedules.clocks import IntervalClock
 from prefect.run_configs import LocalRun, DockerRun, ECSRun, KubernetesRun
@@ -38,6 +39,11 @@ def task_3():
 
 with Flow(
     "Data Warehouse Sleeper",
+    storage=GitHub(
+        repo="kmoonwright/utility_flows", 
+        path="enterprise_demo/filler_flows.py",
+        access_token_secret="GITHUB_ACCESS_TOKEN"
+    ),
     schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
     run_config=LocalRun(labels=["local"])
 ) as flow1:
@@ -50,6 +56,11 @@ flow1.register(project_name="data-warehouse")
 
 with Flow(
     "Operations Sleeper",
+    storage=GitHub(
+        repo="kmoonwright/utility_flows", 
+        path="enterprise_demo/filler_flows.py",
+        access_token_secret="GITHUB_ACCESS_TOKEN"
+    ),
     schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
     run_config=LocalRun()
 ) as flow2:
@@ -62,6 +73,11 @@ flow2.register(project_name="data-warehouse")
 
 with Flow(
     "Dev Environment Sleeper",
+    storage=GitHub(
+        repo="kmoonwright/utility_flows", 
+        path="enterprise_demo/filler_flows.py",
+        access_token_secret="GITHUB_ACCESS_TOKEN"
+    ),
     schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
     run_config=DockerRun(labels=["developer"])
 ) as flow3:
@@ -74,6 +90,11 @@ flow3.register(project_name="developer-flows")
 
 with Flow(
     "Staging Environment Sleeper",
+    storage=GitHub(
+        repo="kmoonwright/utility_flows", 
+        path="enterprise_demo/filler_flows.py",
+        access_token_secret="GITHUB_ACCESS_TOKEN"
+    ),
     schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
     run_config=ECSRun(labels=["staging"])
 ) as flow4:
@@ -86,6 +107,11 @@ flow4.register(project_name="staging-flows")
 
 with Flow(
     "Production Environment Sleeper",
+    storage=GitHub(
+        repo="kmoonwright/utility_flows", 
+        path="enterprise_demo/filler_flows.py",
+        access_token_secret="GITHUB_ACCESS_TOKEN"
+    ),
     schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
     run_config=KubernetesRun(labels=["production"])
 ) as flow5:
