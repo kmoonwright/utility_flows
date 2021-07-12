@@ -24,7 +24,7 @@ def connect_to_snowflake():
     time.sleep(10)
 
 @task
-def upload_to_snowflake(data):
+def upload_to_snowflake(client, data):
     time.sleep(30)
 
 with Flow(
