@@ -79,7 +79,7 @@ with Flow(
         access_token_secret="GITHUB_ACCESS_TOKEN"
     ),
     schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
-    run_config=LocalRun(labels=["staging"])
+    run_config=DockerRun(labels=["staging"])
 ) as flow3:
     task1 = task_1()
     task2 = task_2()
