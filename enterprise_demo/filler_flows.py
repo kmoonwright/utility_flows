@@ -38,7 +38,7 @@ def task_3():
         raise signals.FAIL()
 
 with Flow(
-    "Data Warehouse Sleeper",
+    "Data Warehouse ETL",
     storage=GitHub(
         repo="kmoonwright/utility_flows", 
         path="enterprise_demo/filler_flows.py",
@@ -55,69 +55,52 @@ with Flow(
 flow1.register(project_name="data-warehouse")
 
 with Flow(
-    "Operations Sleeper",
+    "Dev Environment ML Training",
     storage=GitHub(
         repo="kmoonwright/utility_flows", 
         path="enterprise_demo/filler_flows.py",
         access_token_secret="GITHUB_ACCESS_TOKEN"
     ),
     schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
-    run_config=LocalRun()
+    run_config=LocalRun(labels=["developer"])
 ) as flow2:
     task1 = task_1()
     task2 = task_2()
     task3 = task_3()
     task2.set_upstream(task1)
     task3.set_upstream(task2)
-flow2.register(project_name="data-warehouse")
+flow2.register(project_name="developer-flows")
 
 with Flow(
-    "Dev Environment Sleeper",
+    "Staging Environment ML Training",
     storage=GitHub(
         repo="kmoonwright/utility_flows", 
         path="enterprise_demo/filler_flows.py",
         access_token_secret="GITHUB_ACCESS_TOKEN"
     ),
     schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
-    run_config=DockerRun(labels=["developer"])
+    run_config=LocalRun(labels=["staging"])
 ) as flow3:
     task1 = task_1()
     task2 = task_2()
     task3 = task_3()
     task2.set_upstream(task1)
     task3.set_upstream(task2)
-flow3.register(project_name="developer-flows")
+flow3.register(project_name="staging-flows")
 
 with Flow(
-    "Staging Environment Sleeper",
+    "Production Environment Pipeline",
     storage=GitHub(
         repo="kmoonwright/utility_flows", 
         path="enterprise_demo/filler_flows.py",
         access_token_secret="GITHUB_ACCESS_TOKEN"
     ),
     schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
-    run_config=ECSRun(labels=["staging"])
+    run_config=DockerRun(labels=["production"])
 ) as flow4:
     task1 = task_1()
     task2 = task_2()
     task3 = task_3()
     task2.set_upstream(task1)
     task3.set_upstream(task2)
-flow4.register(project_name="staging-flows")
-
-with Flow(
-    "Production Environment Sleeper",
-    storage=GitHub(
-        repo="kmoonwright/utility_flows", 
-        path="enterprise_demo/filler_flows.py",
-        access_token_secret="GITHUB_ACCESS_TOKEN"
-    ),
-    schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
-    run_config=KubernetesRun(labels=["production"])
-) as flow5:
-    task1 = task_1()
-    task2 = task_2()
-    task3 = task_3()
-    task2.set_upstream(task1)
-    task3.set_upstream(task2)
-flow5.register(project_name="production-flows")
+flow4.register(project_name="production-flows")
