@@ -10,14 +10,14 @@ from prefect.schedules.clocks import IntervalClock
 from prefect.run_configs import LocalRun, DockerRun, ECSRun, KubernetesRun
 from prefect.engine import signals
 
-@task
+@task(name="Extract Dataset")
 def task_1():
     logger = prefect.context.get("logger")
     interval = randrange(0, 60)
     logger.info(interval)
     time.sleep(interval)
 
-@task
+@task(name="Transform Staging")
 def task_2():
     logger = prefect.context.get("logger")
     interval = randrange(0, 60)
@@ -27,7 +27,7 @@ def task_2():
         logger.info("Skipping task...")
         raise signals.SKIP()
 
-@task
+@task(name="Final normalization")
 def task_3():
     logger = prefect.context.get("logger")
     interval = randrange(0, 60)
@@ -44,7 +44,7 @@ with Flow(
         path="enterprise_demo/filler_flows.py",
         access_token_secret="GITHUB_ACCESS_TOKEN"
     ),
-    schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
+    # schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
     run_config=LocalRun(labels=["local"])
 ) as flow1:
     task1 = task_1()
@@ -61,7 +61,7 @@ with Flow(
         path="enterprise_demo/filler_flows.py",
         access_token_secret="GITHUB_ACCESS_TOKEN"
     ),
-    schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
+    # schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
     run_config=LocalRun(labels=["developer"])
 ) as flow2:
     task1 = task_1()
@@ -78,7 +78,7 @@ with Flow(
         path="enterprise_demo/filler_flows.py",
         access_token_secret="GITHUB_ACCESS_TOKEN"
     ),
-    schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
+    # schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
     run_config=DockerRun(labels=["staging"])
 ) as flow3:
     task1 = task_1()
@@ -95,7 +95,7 @@ with Flow(
         path="enterprise_demo/filler_flows.py",
         access_token_secret="GITHUB_ACCESS_TOKEN"
     ),
-    schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
+    # schedule=Schedule(clocks=[IntervalClock(timedelta(minutes=2))]),
     run_config=DockerRun(labels=["production"])
 ) as flow4:
     task1 = task_1()
