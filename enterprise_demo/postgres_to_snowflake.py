@@ -5,6 +5,7 @@ from prefect.storage import GitHub
 from prefect.schedules import Schedule
 from prefect.schedules.clocks import IntervalClock
 from prefect.run_configs import DockerRun
+from prefect.engine import signals
 
 @task
 def connect_to_postgres():
@@ -13,6 +14,8 @@ def connect_to_postgres():
 @task
 def execute_query(client, table_name):
     time.sleep(30)
+    if table_name is "Users":
+        raise signals.FAIL(message="TableNotFound: The table specified does not exist.")
     return table_name
 
 @task
