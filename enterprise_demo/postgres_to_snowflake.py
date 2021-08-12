@@ -21,7 +21,7 @@ def execute_query(client, table_name):
         time.sleep(9)
         raise signals.FAIL(message="TableNotFound: The table specified does not exist.")
     else:
-        time.sleep(19)
+        time.sleep(9)
     return table_name
 
 @task(name="Create DF")
