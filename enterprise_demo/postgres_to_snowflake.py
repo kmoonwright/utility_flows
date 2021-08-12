@@ -26,7 +26,7 @@ def execute_query(client, table_name):
 
 @task
 def create_df(data):
-    time.sleep(14)
+    time.sleep(8)
 
 @task
 def connect_to_snowflake():
@@ -34,7 +34,7 @@ def connect_to_snowflake():
 
 @task
 def upload_to_snowflake(client, data):
-    time.sleep(14)
+    time.sleep(8)
 
 with Flow(
     "ETL PostgreSQL to Snowflake",
