@@ -9,11 +9,11 @@ from prefect.schedules.clocks import IntervalClock
 from prefect.run_configs import DockerRun
 from prefect.engine import signals
 
-@task
+@task(name="Connect to Postgres")
 def connect_to_postgres():
     time.sleep(5)
 
-@task
+@task(name="Execute Query")
 def execute_query(client, table_name):
     logger = prefect.context.get("logger")
     logger.info(f"Table Name: {table_name}")
@@ -24,15 +24,15 @@ def execute_query(client, table_name):
         time.sleep(19)
     return table_name
 
-@task
+@task(name="Create DF")
 def create_df(data):
     time.sleep(8)
 
-@task
+@task(name="Connect to Snowflake")
 def connect_to_snowflake():
     time.sleep(4)
 
-@task
+@task(name="Upload to Snowflake")
 def upload_to_snowflake(client, data):
     time.sleep(8)
 
@@ -49,7 +49,7 @@ with Flow(
         image="prefecthq/prefect:latest"
     )
 ) as flow:
-    postgres_table = Parameter(name="Table Name", default="User")
+    postgres_table = Parameter(name="Table Name Input", default="User")
     pg_client = connect_to_postgres()
     query = execute_query(pg_client, postgres_table)
     df = create_df(query)
