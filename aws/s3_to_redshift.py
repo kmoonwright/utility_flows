@@ -1,4 +1,6 @@
-from prefect import task, Flow
+from prefect import task, Flow, Parameter
+from prefect.tasks.secrets import PrefectSecret
+from prefect.tasks.aws import S3Download, LambdaCreate
 
 """
 Tasks
@@ -26,3 +28,19 @@ Execution
     2 - **Kubernetes Agent to submit K8s Jobs, "eks" labels 
     
 """
+my_s3_key = PrefectSecret(name="Secret Key")
+buckets = Parameter(name="Bucket List", default=["users", "transactions"])
+
+upload_data = S3Download(key=my_s3_key)
+event_trigger = LambdaCreate()
+
+@task
+def transform_data(data):
+    pass
+
+@task
+def upload_to_redshift(data):
+    pass
+
+with Flow("S3 to Redshift") as flow:
+    upload_data()
