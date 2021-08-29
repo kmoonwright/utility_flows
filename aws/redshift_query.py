@@ -1,20 +1,32 @@
 import utils.redshift as rs
+import logging
 
-print("Connection starting....")
-conn = rs.create_conn()
-print("Connection complete")
+logging.basicConfig(level=logging.NOTSET)
 
-cursor = conn.cursor()
-print("Cursor created... Initiating query")
-query = rs.create_query()
-rs.select(cursor, query)
-print("Query complete.")
+def main():
+    logging.info("Connection starting....")
+    conn = rs.create_conn()
+    logging.info("Connection complete")
 
-print("Initiating shutdown....")
-cursor.close()
-conn.close()
+    logging.info("Initiating query 1...")
+    cursor = conn.cursor()
+    query = rs.default_query()
+    rs.select(cursor, query)
 
+    logging.info("Initiating query 2....")
+    query = """
+        SELECT *    
+        FROM pg_table_def    
+        WHERE tablename = 'sales';    
+    """
+    rs.execute_sql(query)
+    logging.info("Query complete.")
 
-print("\n<<<<--->>>>")
-print("\n<<<<DONEZO>>>>")
-print("\n<<<<------------>>>>")
+    logging.info("Initiating shutdown....")
+
+    logging.info("\n<<<<--->>>>")
+    logging.info("\n<<<<DONEZO>>>>")
+    logging.info("\n<<<<------------>>>>")
+
+if __name__ == "__main__":
+    main()
