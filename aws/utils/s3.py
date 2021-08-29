@@ -1,9 +1,8 @@
-import logging
 import boto3
 from botocore.exceptions import ClientError
+import json
 import datetime
 from dotenv import load_dotenv, dotenv_values
-import json
 
 load_dotenv()
 
@@ -14,6 +13,9 @@ AWS_REGION=settings_dict["AWS_REGION"]
 AWS_ACCESS_KEY_ID=settings_dict["AWS_ACCESS_KEY_ID"]
 AWS_SECRET_ACCESS_KEY=settings_dict["AWS_SECRET_ACCESS_KEY"]
 SESSION_TOKEN=settings_dict["SESSION_TOKEN"]
+
+import logging
+logging.basicConfig(level=logging.NOTSET)
 
 import pathlib
 BASE_DIR = pathlib.Path(__file__).parent.resolve()
