@@ -3,6 +3,8 @@ from dotenv import load_dotenv, dotenv_values
 import json
 import logging
 
+logging.basicConfig(level=logging.NOTSET)
+
 load_dotenv()
 settings = dotenv_values("aws/.env")
 settings_dict = json.loads(json.dumps(settings))
@@ -23,7 +25,6 @@ config_dict = {
 
 
 def create_conn():
-    print(f"INFO LOG ---> config: {config_dict}")
     try:
         conn=psycopg2.connect(
             user = config_dict['user'],
@@ -36,7 +37,7 @@ def create_conn():
         print(err)
     return conn
 
-def create_query():
+def default_query():
     return """
         SELECT *    
         FROM pg_table_def    
@@ -60,10 +61,10 @@ def execute_sql(query):
         logging.error(e)
     else:
         cursor = client.cursor()
-        cursor.execute(query="""
-                        SELECT *
-                        FROM `table`;
-                        """)
+        cursor.execute(query)
+        rows = cursor.fetchall()
+        for row in rows:
+            logging.info(row)
     finally:
         cursor.close()
         client.close()
