@@ -28,7 +28,7 @@ s3.list_buckets(s3_client)
 #     bucket="return-box",
 #     file_name="uploads/test_data.csv"
 # )
-
+# # Create dataframe from csv
 # df = pd.read_csv(downloaded['Body'])
 # print(df)
 

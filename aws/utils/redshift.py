@@ -1,6 +1,7 @@
 import psycopg2
 from dotenv import load_dotenv, dotenv_values
 import json
+import logging
 
 load_dotenv()
 settings = dotenv_values("aws/.env")
@@ -51,3 +52,18 @@ def select(cursor, query):
     rows = cursor.fetchall()
     for row in rows:
         print(row)
+
+def execute_sql(query):
+    try:
+        client = create_conn()
+    except Exception as e:
+        logging.error(e)
+    else:
+        cursor = client.cursor()
+        cursor.execute(query="""
+                        SELECT *
+                        FROM `table`;
+                        """)
+    finally:
+        cursor.close()
+        client.close()
