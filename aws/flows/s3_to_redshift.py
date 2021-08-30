@@ -5,7 +5,7 @@ from pathlib import Path
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from prefect import task, Flow, Parameter
+from prefect import task, Flow, Parameter, unmapped
 from prefect.storage import Docker
 from prefect.tasks.notifications.slack_task import SlackTask
 from prefect.artifacts import create_markdown, create_link
@@ -88,24 +88,24 @@ run_config = ECSRun(
 )
 schedule = Schedule(
     clocks=[
-        CronClock("0 8 * * 1-5", start_date=pendulum.now(tz="US/Pacific")),
-        CronClock("0 8 * * 1-5", start_date=pendulum.now(tz="US/Pacific"))
+        CronClock("0 12 * * 1-5", start_date=pendulum.now(tz="US/Pacific")),
+        CronClock("0 12 * * 1-5", start_date=pendulum.now(tz="US/Pacific"))
     ]
 )
 
 
 with Flow(
     "S3 to Redshift",
-    storage=storage,
-    run_config=run_config,
-    schedule=schedule
+    # storage=storage,
+    # run_config=run_config,
+    # schedule=schedule
 ) as flow:
     # ----STAGE 1----
     conn = connect_to_s3()
-    file_to_download = Parameter("File to download", default="uploads/test_data.csv")
-    s3_bucket = Parameter("S3 Bucket", default="blockbuster")
-    downloaded = download_from_s3(conn, s3_bucket, file_to_download)
-    create_link(s3_bucket, file_to_download)
+    file_to_download = Parameter("File to download", default="user_data.csv")
+    s3_buckets = Parameter("S3 Bucket", default=["loading-store-1", "loading-store-2"])
+    downloaded = download_from_s3.map(unmapped(conn), s3_buckets, unmapped(file_to_download))
+    create_link.map(s3_buckets, unmapped(file_to_download))
 
     # ----STAGE 2----
     # test_data = local_data()
@@ -119,4 +119,6 @@ with Flow(
     insert_df(redshift, transformed, dbname)
 
     # ----STAGE 4----
-    slack_notification()
+    # slack_notification()
+
+flow.run()
