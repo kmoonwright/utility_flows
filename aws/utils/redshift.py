@@ -1,4 +1,4 @@
-from ast import Str
+import datetime
 import psycopg2
 from dotenv import load_dotenv, dotenv_values
 import json
@@ -89,7 +89,7 @@ def insert_df(client, df, table):
             # value_str = ",".join([str(item) for item in value_data])
             # query = f"INSERT INTO {table}({cols}) VALUES({str(value_str)})"
             value1, value2 = str(value_data[0]), value_data[1]
-            query = f"INSERT INTO {table}({cols}) VALUES({value1},\'{value2}\');"
+            query = f"INSERT INTO {table}({cols}) VALUES({value1},\'{value2}\',\'{datetime.datetime.now()}\');"
             cursor.execute(query)
             print(f"Query: {query}\n")
         cursor.close()
