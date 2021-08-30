@@ -1,3 +1,4 @@
+from ast import Str
 import psycopg2
 from dotenv import load_dotenv, dotenv_values
 import json
@@ -20,18 +21,17 @@ config_dict = {
     'password': REDSHIFT_PASSWORD,
     'host' : REDSHIFT_ENDPOINT, 
     'port': REDSHIFT_PORT, 
-    'dbname' : 'dev', 
 }
 
 
-def create_conn():
+def create_conn(dbname:str):
     try:
         conn=psycopg2.connect(
             user = config_dict['user'],
             password = config_dict['password'],
             host = config_dict['host'],
             port = config_dict['port'],
-            dbname = config_dict['dbname'],
+            dbname = dbname,
         )
     except Exception as err:
         print(err)
@@ -44,27 +44,27 @@ def default_query():
         WHERE tablename = 'sales';    
         """
 
-def select(cursor, query):
-    try:       
-        cursor.execute(query)
-    except Exception as err:
-            print(err.code,err)
- 
-    rows = cursor.fetchall()
-    for row in rows:
-        print(row)
-
-def execute_sql(query):
+def execute_sql_command(dbname:str, command):
     try:
-        client = create_conn()
-    except Exception as e:
-        logging.error(e)
-    else:
+        client = create_conn(dbname)
         cursor = client.cursor()
-        cursor.execute(query)
+        cursor.execute(command)
         rows = cursor.fetchall()
         for row in rows:
             logging.info(row)
+    except Exception as e:
+        logging.error(e)
     finally:
         cursor.close()
         client.close()
+
+# OLD
+# def select(cursor, query):
+#     try:       
+#         cursor.execute(query)
+#     except Exception as err:
+#             print(err.code,err)
+ 
+#     rows = cursor.fetchall()
+#     for row in rows:
+#         print(row)
