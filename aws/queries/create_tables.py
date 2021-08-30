@@ -7,6 +7,8 @@ import utils.redshift as rs
 
 def generate_create_commands() -> Iterable:
     return (
+        "DROP TABLE users",
+        "DROP TABLE event",
         """
         CREATE TABLE users (
             user_id INTEGER PRIMARY KEY,
