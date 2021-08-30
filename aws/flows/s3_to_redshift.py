@@ -13,8 +13,6 @@ import utils.redshift as rs
 def connect_to_s3():
     return s3.create_client()
 
-Parameter("File to download")
-
 @task
 def download_from_s3(client, bucket, file_name):
     return s3.download_from_s3_to_memory(client, bucket, file_name)
@@ -34,8 +32,6 @@ def transform(df):
 
 print("----STAGE 2.....")
 
-Parameter("DBname", default="suppliers")
-
 @task
 def connect_to_rs(dbname):
     conn = rs.create_conn(dbname)
@@ -49,3 +45,19 @@ def insert_df(client, df, table):
     return
 
 print("----STAGE 3.....")
+
+
+
+with Flow("S3 to Redshift") as flow:
+    conn = connect_to_s3()
+    file_to_download = Parameter("File to download")
+    s3_bucket = Parameter("S3 Bucket", default="blockbuster")
+    downloaded = download_from_s3(conn, s3_bucket, file_to_download)
+
+    # test_data = local_data()
+    dataframe = create_dataframe(downloaded)
+    transformed = transform(dataframe)
+
+    dbname = Parameter("DBname", default="suppliers")
+    redshift = connect_to_rs(dbname)
+    insert_df(redshift, transformed, dbname)
