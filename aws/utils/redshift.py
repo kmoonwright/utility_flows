@@ -51,19 +51,30 @@ def execute_sql_command(client, command):
         rows = cursor.fetchall()
         for row in rows:
             logging.info(row)
+        cursor.close()
     except Exception as e:
         logging.error(e)
     finally:
-        cursor.close()
-        client.close()
+        if client is not None:
+            client.close()
 
-# OLD
-# def select(cursor, query):
-#     try:       
-#         cursor.execute(query)
-#     except Exception as err:
-#             print(err.code,err)
- 
-#     rows = cursor.fetchall()
-#     for row in rows:
-#         print(row)
+def execute_many_commands(client, commands):
+    """ 
+        Execute multiple SQL commands
+        Takes:
+        - client object
+        - commands, iterable
+    """
+    try:
+        cur = client.cursor()
+        for command in commands:
+            cur.execute(command)
+        # close communication with the PostgreSQL database server
+        cur.close()
+        # commit the changes
+        client.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if client is not None:
+            client.close()
