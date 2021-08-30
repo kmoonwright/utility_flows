@@ -44,9 +44,8 @@ def default_query():
         WHERE tablename = 'sales';    
         """
 
-def execute_sql_command(dbname:str, command):
+def execute_sql_command(client, command):
     try:
-        client = create_conn(dbname)
         cursor = client.cursor()
         cursor.execute(command)
         rows = cursor.fetchall()
