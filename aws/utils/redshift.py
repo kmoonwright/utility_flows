@@ -78,3 +78,25 @@ def execute_many_commands(client, commands):
     finally:
         if client is not None:
             client.close()
+
+def insert_df(client, df, table):
+    cursor = client.cursor()
+    try:
+        cursor = client.cursor()
+        for i in df.index:
+            cols  = ','.join(list(df.columns))
+            value_data  = [df.at[i,col] for col in list(df.columns)]
+            # value_str = ",".join([str(item) for item in value_data])
+            # query = f"INSERT INTO {table}({cols}) VALUES({str(value_str)})"
+            value1, value2 = str(value_data[0]), value_data[1]
+            query = f"INSERT INTO {table}({cols}) VALUES({value1},\'{value2}\');"
+            cursor.execute(query)
+            print(f"Query: {query}\n")
+        cursor.close()
+        # commit the changes
+        client.commit()
+    except (Exception, psycopg2.DatabaseError) as error:
+        print(error)
+    finally:
+        if client is not None:
+            client.close()
