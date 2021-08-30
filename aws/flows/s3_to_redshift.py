@@ -85,7 +85,7 @@ storage = Docker(
 )
 run_config = ECSRun(
     env={"sample_key": "sample_value"},
-    labels=["demo-flow"]
+    labels=["staging"]
 )
 schedule = Schedule(
     clocks=[
@@ -126,7 +126,7 @@ with Flow(
     create_df_artifact(transformed)
 
     # ----STAGE 3----
-    dbname = Parameter("DBname", default="suppliers")
+    dbname = Parameter("DB Name", default="suppliers")
     tablename = Parameter("Table Name", default="users")
     redshift = connect_to_rs(dbname)
     insert_df(redshift, transformed, tablename)
