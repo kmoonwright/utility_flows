@@ -89,7 +89,7 @@ def insert_df(client, df, table):
             # value_str = ",".join([str(item) for item in value_data])
             # query = f"INSERT INTO {table}({cols}) VALUES({str(value_str)})"
             value1, value2 = str(value_data[0]), value_data[1]
-            query = f"INSERT INTO {table}({cols}) VALUES({value1},\'{value2}\',\'{datetime.datetime.now()}\');"
+            query = f"INSERT INTO {table}({cols}) VALUES({value1},\'{value2}\',\'{datetime.datetime.now().isoformat()}\');"
             cursor.execute(query)
             print(f"Query: {query}\n")
         cursor.close()
