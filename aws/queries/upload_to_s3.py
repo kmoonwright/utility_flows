@@ -24,19 +24,22 @@ def upload_many_to_s3():
         client=s3_client, 
         file_name=str(file1_path), 
         bucket="loading-store-1",
-        object_name=f"{datetime.datetime.now()}--{file1_path.name}"
+        object_name=str(file1_path.name),
+        # object_name=f"{datetime.datetime.now()}--{file1_path.name}",
     )
     s3.upload_to_s3(
         client=s3_client, 
         file_name=str(file2_path), 
         bucket="loading-store-1",
-        object_name=f"{datetime.datetime.now()}--{file2_path.name}"
+        object_name=str(file2_path.name),
+        # object_name=f"{datetime.datetime.now()}--{file2_path.name}",
     )
     s3.upload_to_s3(
         client=s3_client, 
         file_name=str(file3_path), 
         bucket="loading-store-1",
-        object_name=f"{datetime.datetime.now()}--{file3_path.name}"
+        object_name=str(file3_path.name),
+        # object_name=f"{datetime.datetime.now()}--{file3_path.name}",
     )
 
     # LOAD TO BUCKET: "loading-store-2"
@@ -44,19 +47,22 @@ def upload_many_to_s3():
         client=s3_client, 
         file_name=str(file1_path), 
         bucket="loading-store-2",
-        object_name=f"{datetime.datetime.now()}--{file1_path.name}"
+        object_name=str(file1_path.name),
+        # object_name=f"{datetime.datetime.now()}--{file1_path.name}",
     )
     s3.upload_to_s3(
         client=s3_client, 
         file_name=str(file2_path), 
         bucket="loading-store-2",
-        object_name=f"{datetime.datetime.now()}--{file2_path.name}"
+        object_name=str(file2_path.name),
+        # object_name=f"{datetime.datetime.now()}--{file2_path.name}",
     )
     s3.upload_to_s3(
         client=s3_client, 
         file_name=str(file3_path), 
         bucket="loading-store-2",
-        object_name=f"{datetime.datetime.now()}--{file3_path.name}"
+        object_name=str(file3_path.name),
+        # object_name=f"{datetime.datetime.now()}--{file3_path.name}",
     )
 
     print("\n<<<<DONEZO>>>>")
