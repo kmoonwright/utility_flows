@@ -12,14 +12,16 @@ def generate_create_commands() -> Iterable:
         """
         CREATE TABLE users (
             user_id INTEGER PRIMARY KEY,
-            user_name VARCHAR(255) NOT NULL
+            user_name VARCHAR(255) NOT NULL,
+            timestamp DATE NOT NULL
         )
         """,
         """ 
         CREATE TABLE event (
-                event_id INTEGER PRIMARY KEY,
-                event_name VARCHAR(255) NOT NULL
-                )
+            event_id INTEGER PRIMARY KEY,
+            event_name VARCHAR(255) NOT NULL,
+            timestamp DATE NOT NULL
+            )
         """,
     )
 
