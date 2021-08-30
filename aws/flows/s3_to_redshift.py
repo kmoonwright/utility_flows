@@ -7,6 +7,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from prefect import task, Flow, Parameter
 from prefect.storage import Docker
 from prefect.tasks.notifications.slack_task import SlackTask
+from prefect.artifacts import create_markdown, create_link
 
 import utils.s3 as s3
 import utils.redshift as rs
@@ -22,6 +23,10 @@ def download_from_s3(client, bucket, file_name):
     return s3.download_from_s3_to_memory(client, bucket, file_name)
 
 @task
+def create_bucket_link(bucket, file_path):
+    create_link(f"https://{bucket}.s3.us-west-2.amazonaws.com/{file_path}")
+
+@task
 def local_data(file_name):
     file_path = Path(__file__).parent.parent.resolve() / Path(f"data/{file_name}")
     return file_path
@@ -35,6 +40,10 @@ def create_dataframe(csv_file):
 @task
 def transform(df):
     return df
+
+@task
+def create_df_artifact(data):
+    create_markdown(data)
 
 # ----STAGE 3----
 
@@ -71,14 +80,16 @@ storage = Docker(
 with Flow("S3 to Redshift") as flow:
     # ----STAGE 1----
     conn = connect_to_s3()
-    file_to_download = Parameter("File to download")
+    file_to_download = Parameter("File to download", default="uploads/test_data.csv")
     s3_bucket = Parameter("S3 Bucket", default="blockbuster")
     downloaded = download_from_s3(conn, s3_bucket, file_to_download)
+    create_link(s3_bucket, file_to_download)
 
     # ----STAGE 2----
     # test_data = local_data()
     dataframe = create_dataframe(downloaded)
     transformed = transform(dataframe)
+    create_df_artifact(transformed)
 
     # ----STAGE 3----
     dbname = Parameter("DBname", default="suppliers")
