@@ -49,21 +49,41 @@ def insert_df(client, df, table):
     return
 
 # ----STAGE 4----
-
-storage = Docker(
-
+slack_notification = SlackTask(
+    message="Everything is alright, alright, alright...",
+    webhook_secret="SLACK_WEBHOOK_URL_MHQ",
 )
 
+# ----Flow Configurations----
+storage = Docker(
+    files={
+        # absolute path source -> destination in image
+        str(Path(__file__).parent.parent.resolve()) / Path("utils/s3.py"): "/modules/s3.py",
+        str(Path(__file__).parent.parent.resolve()) / Path("utils/redshift.py"): "/modules/redshift.py",
+    },
+    env_vars={
+        # append modules directory to PYTHONPATH
+        "PYTHONPATH": "$PYTHONPATH:modules/"
+    },
+)
+
+
 with Flow("S3 to Redshift") as flow:
+    # ----STAGE 1----
     conn = connect_to_s3()
     file_to_download = Parameter("File to download")
     s3_bucket = Parameter("S3 Bucket", default="blockbuster")
     downloaded = download_from_s3(conn, s3_bucket, file_to_download)
 
+    # ----STAGE 2----
     # test_data = local_data()
     dataframe = create_dataframe(downloaded)
     transformed = transform(dataframe)
 
+    # ----STAGE 3----
     dbname = Parameter("DBname", default="suppliers")
     redshift = connect_to_rs(dbname)
     insert_df(redshift, transformed, dbname)
+
+    # ----STAGE 4----
+    slack_notification()
