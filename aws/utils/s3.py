@@ -15,7 +15,7 @@ AWS_SECRET_ACCESS_KEY=settings_dict["AWS_SECRET_ACCESS_KEY"]
 SESSION_TOKEN=settings_dict["SESSION_TOKEN"]
 
 import logging
-logging.basicConfig(level=logging.NOTSET)
+logging.basicConfig(level=logging.INFO)
 
 import pathlib
 BASE_DIR = pathlib.Path(__file__).parent.resolve()
