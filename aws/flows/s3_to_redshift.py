@@ -24,7 +24,8 @@ def connect_to_s3():
 
 @task
 def download_from_s3(client, bucket, file_name):
-    return s3.download_from_s3_to_memory(client, bucket, file_name)
+    downloaded = s3.download_from_s3_to_memory(client, bucket, file_name)
+    return downloaded
 
 @task
 def create_bucket_link(bucket, file_path):
@@ -39,7 +40,7 @@ def local_data(file_name):
 
 @task
 def create_dataframe(csv_file):
-    return pd.read_csv(csv_file)
+    return pd.read_csv(csv_file['Body'])
 
 @task
 def transform(df):
@@ -88,8 +89,16 @@ run_config = ECSRun(
 )
 schedule = Schedule(
     clocks=[
-        CronClock("0 12 * * 1-5", start_date=pendulum.now(tz="US/Pacific")),
-        CronClock("0 12 * * 1-5", start_date=pendulum.now(tz="US/Pacific"))
+        CronClock(
+            "0 12 * * 1-5", 
+            start_date=pendulum.now(tz="US/Pacific"), 
+            parameter_defaults={"Table Name": "users"}
+        ),
+        CronClock(
+            "0 12 * * 1-5", 
+            start_date=pendulum.now(tz="US/Pacific"),
+            parameter_defaults={"Table Name": "events"}
+        ),
     ]
 )
 
@@ -103,9 +112,12 @@ with Flow(
     # ----STAGE 1----
     conn = connect_to_s3()
     file_to_download = Parameter("File to download", default="user_data.csv")
-    s3_buckets = Parameter("S3 Bucket", default=["loading-store-1", "loading-store-2"])
-    downloaded = download_from_s3.map(unmapped(conn), s3_buckets, unmapped(file_to_download))
-    create_link.map(s3_buckets, unmapped(file_to_download))
+    # s3_buckets = Parameter("S3 Bucket", default=["loading-store-1", "loading-store-2"])
+    # downloaded = download_from_s3.map(unmapped(conn), s3_buckets, unmapped(file_to_download))
+    # create_bucket_link.map(s3_bucket, unmapped(file_to_download))
+    s3_bucket = Parameter("S3 Bucket", default="loading-store-1")
+    downloaded = download_from_s3(conn, s3_bucket, file_to_download)
+    create_bucket_link(s3_bucket, file_to_download)
 
     # ----STAGE 2----
     # test_data = local_data()
@@ -115,8 +127,9 @@ with Flow(
 
     # ----STAGE 3----
     dbname = Parameter("DBname", default="suppliers")
+    tablename = Parameter("Table Name", default="users")
     redshift = connect_to_rs(dbname)
-    insert_df(redshift, transformed, dbname)
+    insert_df(redshift, transformed, tablename)
 
     # ----STAGE 4----
     # slack_notification()
