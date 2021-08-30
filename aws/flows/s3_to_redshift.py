@@ -1,5 +1,6 @@
 import psycopg2
 import pandas as pd
+import datetime, pendulum
 from pathlib import Path
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -8,6 +9,9 @@ from prefect import task, Flow, Parameter
 from prefect.storage import Docker
 from prefect.tasks.notifications.slack_task import SlackTask
 from prefect.artifacts import create_markdown, create_link
+from prefect.run_configs import ECSRun
+from prefect.schedules import Schedule
+from prefect.schedules.clocks import CronClock
 
 import utils.s3 as s3
 import utils.redshift as rs
@@ -65,6 +69,9 @@ slack_notification = SlackTask(
 
 # ----Flow Configurations----
 storage = Docker(
+    registry_url="kmoonwright",
+    image_name="flows",
+    image_tag="aws-s3-to-redshift",
     files={
         # absolute path source -> destination in image
         str(Path(__file__).parent.parent.resolve()) / Path("utils/s3.py"): "/modules/s3.py",
@@ -75,9 +82,24 @@ storage = Docker(
         "PYTHONPATH": "$PYTHONPATH:modules/"
     },
 )
+run_config = ECSRun(
+    env={"sample_key": "sample_value"},
+    labels=["demo-flow"]
+)
+schedule = Schedule(
+    clocks=[
+        CronClock("0 8 * * 1-5", start_date=pendulum.now(tz="US/Pacific")),
+        CronClock("0 8 * * 1-5", start_date=pendulum.now(tz="US/Pacific"))
+    ]
+)
 
 
-with Flow("S3 to Redshift") as flow:
+with Flow(
+    "S3 to Redshift",
+    storage=storage,
+    run_config=run_config,
+    schedule=schedule
+) as flow:
     # ----STAGE 1----
     conn = connect_to_s3()
     file_to_download = Parameter("File to download", default="uploads/test_data.csv")
