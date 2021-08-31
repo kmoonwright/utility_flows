@@ -101,12 +101,12 @@ schedule = Schedule(
         CronClock(
             "0 12 * * 1-5", 
             start_date=pendulum.now(tz="US/Pacific"), 
-            parameter_defaults={"Table Name": "users"}
+            parameter_defaults={"Redshift Table Name": "users"}
         ),
         CronClock(
             "0 12 * * 1-5", 
             start_date=pendulum.now(tz="US/Pacific"),
-            parameter_defaults={"Table Name": "events"}
+            parameter_defaults={"Redshift Table Name": "events"}
         ),
     ]
 )
@@ -121,12 +121,16 @@ with Flow(
     # ----STAGE 1----
     conn = connect_to_s3()
     file_to_download = Parameter("S3 Download Filename", default="user_data.csv")
-    # s3_buckets = Parameter("S3 Bucket", default=["loading-store-1", "loading-store-2"])
-    # downloaded = download_from_s3.map(unmapped(conn), s3_buckets, unmapped(file_to_download))
-    # create_bucket_link.map(s3_bucket, unmapped(file_to_download))
+    
+    # Download from a single bucket
     s3_bucket = Parameter("S3 Download Bucket", default="loading-store-1")
     downloaded = download_from_s3(conn, s3_bucket, file_to_download)
     create_bucket_link(s3_bucket, file_to_download)
+    
+    # Download from multiple buckets with mapping
+    # s3_buckets = Parameter("S3 Bucket", default=["loading-store-1", "loading-store-2"])
+    # downloaded = download_from_s3.map(unmapped(conn), s3_buckets, unmapped(file_to_download))
+    # create_bucket_link.map(s3_bucket, unmapped(file_to_download))
 
     # ----STAGE 2----
     # test_data = local_data()
