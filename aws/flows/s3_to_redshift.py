@@ -46,7 +46,7 @@ def transform(df):
 
 @task
 def create_df_artifact(data):
-    create_markdown(data)
+    create_markdown(f"Transformed Dataframe:\n{data}")
 
 # ----STAGE 3----
 
@@ -62,7 +62,7 @@ def insert_df(client, df, table):
 
 # ----STAGE 4----
 slack_notification = SlackTask(
-    message="Everything is alright, alright, alright...",
+    message="Redshift Upload Successful!",
     webhook_secret="SLACK_WEBHOOK_URL_MHQ",
 )
 
@@ -137,10 +137,11 @@ with Flow(
     dbname = Parameter("Redshift DB Name", default="suppliers")
     tablename = Parameter("Redshift Table Name", default="users")
     redshift = connect_to_rs(dbname)
-    insert_df(redshift, transformed, tablename)
+    upload_to_redshift = insert_df(redshift, transformed, tablename)
 
     # ----STAGE 4----
-    # slack_notification()
+    message_slack = slack_notification()
+    message_slack.set_upstream(upload_to_redshift)
 
 # flow.run()
 flow.register(project_name="AWS")
