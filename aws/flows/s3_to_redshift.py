@@ -94,7 +94,7 @@ storage = Docker(
 )
 run_config = ECSRun(
     env={"sample_key": "sample_value"},
-    labels=["staging"]
+    labels=None,
 )
 schedule = Schedule(
     clocks=[
@@ -115,8 +115,8 @@ schedule = Schedule(
 with Flow(
     "S3 to Redshift",
     storage=storage,
-    # run_config=run_config,
-    # schedule=schedule
+    schedule=schedule,
+    run_config=run_config,
 ) as flow:
     # ----STAGE 1----
     conn = connect_to_s3()
