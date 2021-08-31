@@ -7,7 +7,6 @@ from prefect import task, Flow, Parameter, unmapped
 from prefect.storage import Docker
 from prefect.tasks.notifications.slack_task import SlackTask
 from prefect.artifacts import create_markdown, create_link
-from prefect.run_configs import ECSRun
 from prefect.schedules import Schedule
 from prefect.schedules.clocks import CronClock
 
@@ -92,10 +91,6 @@ storage = Docker(
     ignore_healthchecks=True,
     # only an extreme poweruser should use this ^
 )
-run_config = ECSRun(
-    env={"sample_key": "sample_value"},
-    labels=None,
-)
 schedule = Schedule(
     clocks=[
         CronClock(
@@ -116,7 +111,6 @@ with Flow(
     "S3 to Redshift",
     storage=storage,
     schedule=schedule,
-    run_config=run_config,
 ) as flow:
     # ----STAGE 1----
     conn = connect_to_s3()
