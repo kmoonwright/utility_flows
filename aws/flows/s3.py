@@ -8,7 +8,7 @@ def load_settings():
     import prefect
     if prefect.context.get("flow_run_id"):
         # know we're in cloud
-        return prefect.client.Secret("DICTIONARY_OF_SECRETs").get()
+        return prefect.client.Secret("REDSHIFT CHAMBER OF SECRETS").get()
     else:
         load_dotenv()
         settings = dotenv_values("aws/.env")
