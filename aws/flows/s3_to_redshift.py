@@ -45,8 +45,9 @@ def transform(df):
     return df
 
 @task
-def create_df_artifact(data):
-    create_markdown(f"Transformed Dataframe:\n{data}")
+def create_df_artifact(df):
+    json_df = df.to_json()
+    create_markdown(f"Transformed Dataframe:\n{json_df}")
 
 # ----STAGE 3----
 
