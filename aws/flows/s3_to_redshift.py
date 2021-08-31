@@ -2,8 +2,6 @@ import psycopg2
 import pandas as pd
 import datetime, pendulum
 from pathlib import Path
-import os, sys
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from prefect import task, Flow, Parameter, unmapped
 from prefect.storage import Docker
@@ -13,8 +11,8 @@ from prefect.run_configs import ECSRun
 from prefect.schedules import Schedule
 from prefect.schedules.clocks import CronClock
 
-import utils.s3 as s3
-import utils.redshift as rs
+import s3
+import redshift as rs
 
 # ----STAGE 1----
 
@@ -75,13 +73,21 @@ storage = Docker(
     image_tag="aws-s3-to-redshift",
     files={
         # absolute path source -> destination in image
-        str(Path(__file__).parent.parent.resolve()) / Path("utils/s3.py"): "/modules/s3.py",
-        str(Path(__file__).parent.parent.resolve()) / Path("utils/redshift.py"): "/modules/redshift.py",
+        str(Path(__file__).parent.resolve()) / Path("s3.py"): "/modules/s3.py",
+        str(Path(__file__).parent.resolve()) / Path("redshift.py"): "/modules/redshift.py",
     },
     env_vars={
         # append modules directory to PYTHONPATH
         "PYTHONPATH": "$PYTHONPATH:modules/"
     },
+    python_dependencies=[
+        "python-dotenv",
+        "psycopg2-binary",
+        "boto3",
+        "botocore"
+    ],
+    ignore_healthchecks=True,
+    # only an extreme poweruser should use this ^
 )
 run_config = ECSRun(
     env={"sample_key": "sample_value"},
@@ -105,7 +111,7 @@ schedule = Schedule(
 
 with Flow(
     "S3 to Redshift",
-    # storage=storage,
+    storage=storage,
     # run_config=run_config,
     # schedule=schedule
 ) as flow:
@@ -134,4 +140,5 @@ with Flow(
     # ----STAGE 4----
     # slack_notification()
 
-flow.run()
+# flow.run()
+flow.register(project_name="AWS")
