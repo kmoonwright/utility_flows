@@ -94,7 +94,7 @@ storage = Docker(
 )
 docker_run_config = DockerRun(
     env={"sample_key": "sample_value"},
-    labels=None,
+    labels=["docker"],
 )
 # ecs_run_config = ECSRun(
 #     env={"sample_key": "sample_value"},

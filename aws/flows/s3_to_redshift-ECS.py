@@ -98,7 +98,7 @@ storage = Docker(
 # )
 ecs_run_config = ECSRun(
     env={"sample_key": "sample_value"},
-    labels=None,
+    labels=["fargate"],
     task_role_arn="arn:aws:iam::853106079885:role/ECSTaskS3ECRRole",
 )
 schedule = Schedule(
