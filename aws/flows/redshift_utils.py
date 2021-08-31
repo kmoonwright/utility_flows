@@ -44,9 +44,9 @@ def create_conn(dbname:str):
             port = config_dict['port'],
             dbname = dbname,
         )
+        return conn
     except Exception as err:
         print(err)
-    return conn
 
 def default_query():
     return """
