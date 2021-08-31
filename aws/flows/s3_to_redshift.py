@@ -11,8 +11,8 @@ from prefect.run_configs import ECSRun
 from prefect.schedules import Schedule
 from prefect.schedules.clocks import CronClock
 
-import s3
-import redshift as rs
+import s3_utils as s3
+import redshift_utils as rs
 
 # ----STAGE 1----
 
@@ -73,8 +73,8 @@ storage = Docker(
     image_tag="aws-s3-to-redshift",
     files={
         # absolute path source -> destination in image
-        str(Path(__file__).parent.resolve()) / Path("s3.py"): "/modules/s3.py",
-        str(Path(__file__).parent.resolve()) / Path("redshift.py"): "/modules/redshift.py",
+        str(Path(__file__).parent.resolve()) / Path("s3_utils.py"): "/modules/s3_utils.py",
+        str(Path(__file__).parent.resolve()) / Path("redshift_utils.py"): "/modules/redshift_utils.py",
     },
     env_vars={
         # append modules directory to PYTHONPATH
