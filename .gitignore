@@ -9,3 +9,4 @@ enterprise_demo/agents.yaml
 
 azure/__pycache__
 aws/scratch
+aws/infra
