@@ -35,18 +35,15 @@ config_dict = {
 }
 
 
-def create_conn(dbname:str):
-    try:
-        conn=psycopg2.connect(
-            user = config_dict['user'],
-            password = config_dict['password'],
-            host = config_dict['host'],
-            port = config_dict['port'],
-            dbname = dbname,
-        )
-        return conn
-    except Exception as err:
-        print(err)
+def create_conn(dbname):
+    conn=psycopg2.connect(
+        user = config_dict['user'],
+        password = config_dict['password'],
+        host = config_dict['host'],
+        port = config_dict['port'],
+        dbname = dbname,
+    )
+    return conn
 
 def default_query():
     return """
