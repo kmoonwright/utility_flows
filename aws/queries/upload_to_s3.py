@@ -5,7 +5,7 @@ import datetime
 import os, sys
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import utils.s3 as s3
+import flows.s3_utils as s3
 
 logging.basicConfig(level=logging.INFO)
 
