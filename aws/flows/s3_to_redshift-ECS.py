@@ -118,7 +118,7 @@ schedule = Schedule(
 
 
 with Flow(
-    "S3 to Redshift",
+    "S3 to Redshift - ECS",
     storage=storage,
     schedule=schedule,
     run_config=ecs_run_config,
